@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rent Room Booking System</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2') no-repeat center center/cover;
+}
+
+/* Dark overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: -1;
+}
+
+header {
+  background: rgba(44, 62, 80, 0.9);
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+.search {
+  text-align: center;
+  margin: 20px;
+}
+
+.search input {
+  padding: 10px;
+  width: 220px;
+  border-radius: 5px;
+  border: none;
+}
+
+.search button {
+  padding: 10px 15px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.rooms {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.room {
+  background: white;
+  margin: 15px;
+  width: 260px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
+}
+
+.room:hover {
+  transform: scale(1.05);
+}
+
+.room img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.room-content {
+  padding: 15px;
+}
+
+.room button {
+  background: #2980b9;
+  color: white;
+  padding: 8px;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  margin: 10% auto;
+  width: 300px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.modal-content input {
+  width: 90%;
+  padding: 8px;
+  margin: 10px 0;
+}
+
+.modal-content button {
+  background: #27ae60;
+  color: white;
+  padding: 10px;
+  border: none;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+  font-size: 18px;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <h1>🏠 Rent Room Booking System</h1>
+</header>
+
+<section class="search">
+  <input type="text" id="searchInput" placeholder="Search by location...">
+  <button onclick="searchRoom()">Search</button>
+</section>
+
+<section id="roomList" class="rooms"></section>
+
+<!-- Booking Form -->
+<div id="bookingForm" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeForm()">&times;</span>
+    <h2>Book Room</h2>
+    <input type="text" id="userName" placeholder="Enter your name">
+    <input type="date" id="bookingDate">
+    <button onclick="confirmBooking()">Confirm Booking</button>
+  </div>
+</div>
+
+<script>
+const rooms = [
+  { id: 1, location: "Delhi", price: 5000, img: "https://images.unsplash.com/photo-1505691938895-1758d7feb511" },
+  { id: 2, location: "Mumbai", price: 7000, img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267" },
+  { id: 3, location: "Bangalore", price: 6000, img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae" },
+  { id: 4, location: "Chennai", price: 4500, img: "https://images.unsplash.com/photo-1493809842364-78817add7ffb" },
+  { id: 5, location: "Kolkata", price: 4000, img: "https://images.unsplash.com/photo-1484154218962-a197022b5858" }
+];
+
+let selectedRoom = null;
+
+// Display rooms
+function displayRooms(roomData) {
+  const roomList = document.getElementById("roomList");
+  roomList.innerHTML = "";
+
+  if (roomData.length === 0) {
+    roomList.innerHTML = "<p style='color:white;'>No rooms found!</p>";
+    return;
+  }
+
+  roomData.forEach(room => {
+    roomList.innerHTML += `
+      <div class="room">
+        <img src="${room.img}" alt="Room Image">
+        <div class="room-content">
+          <h3>${room.location}</h3>
+          <p>Price: ₹${room.price}</p>
+          <button onclick="bookRoom(${room.id})">Book Now</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// Search function
+function searchRoom() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = rooms.filter(room =>
+    room.location.toLowerCase().includes(query)
+  );
+  displayRooms(filtered);
+}
+
+// Book room
+function bookRoom(id) {
+  selectedRoom = id;
+  document.getElementById("bookingForm").style.display = "block";
+}
+
+// Close form
+function closeForm() {
+  document.getElementById("bookingForm").style.display = "none";
+}
+
+// Confirm booking
+function confirmBooking() {
+  const name = document.getElementById("userName").value;
+  const date = document.getElementById("bookingDate").value;
+
+  if (name === "" || date === "") {
+    alert("Please fill all details!");
+    return;
+  }
+
+  alert(`Booking Confirmed!
+Name: ${name}
+Room ID: ${selectedRoom}
+Date: ${date}`);
+
+  closeForm();
+}
+
+// Load rooms initially
+displayRooms(rooms);
+</script>
+
+</body>
+</html>
